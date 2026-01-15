@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>银行公司条线培训课题推荐表</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1a3a8f 0%, #2a5bd7 100%);
+            color: white;
+            padding: 25px 30px;
+            border-bottom: 4px solid #ffcc00;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .header h1 i {
+            color: #ffcc00;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+        
+        .controls {
+            padding: 20px 30px;
+            background-color: #f8fafc;
+            border-bottom: 1px solid #e1e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .filter-section {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .filter-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+        
+        select, .search-box {
+            padding: 10px 15px;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            font-size: 14px;
+            background-color: white;
+            min-width: 180px;
+        }
+        
+        .search-box {
+            padding-left: 40px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%234a5568' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: 15px center;
+            background-size: 16px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+        
+        .btn-download {
+            background-color: #2dce89;
+            color: white;
+        }
+        
+        .btn-download:hover {
+            background-color: #24b478;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(45, 206, 137, 0.3);
+        }
+        
+        .btn-reset {
+            background-color: #f7fafc;
+            color: #4a5568;
+            border: 1px solid #cbd5e0;
+        }
+        
+        .btn-reset:hover {
+            background-color: #edf2f7;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            padding: 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+        }
+        
+        thead {
+            background-color: #edf2f7;
+        }
+        
+        th {
+            padding: 16px 15px;
+            text-align: left;
+            font-weight: 700;
+            color: #2d3748;
+            border-bottom: 2px solid #cbd5e0;
+            font-size: 15px;
+            position: sticky;
+            top: 0;
+            background-color: #edf2f7;
+        }
+        
+        td {
+            padding: 14px 15px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 14px;
+        }
+        
+        tbody tr {
+            transition: background-color 0.2s ease;
+        }
+        
+        tbody tr:hover {
+            background-color: #f8fafc;
+        }
+        
+        .category-label {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+            min-width: 70px;
+        }
+        
+        .category-1 { background-color: #e3f2fd; color: #1565c0; } /* 主管行长 */
+        .category-2 { background-color: #f3e5f5; color: #7b1fa2; } /* 中级客户经理 */
+        .category-3 { background-color: #e8f5e8; color: #2e7d32; } /* 初级客户经理 */
+        .category-4 { background-color: #fff3e0; color: #ef6c00; } /* 团队负责人 */
+        .category-5 { background-color: #fce4ec; color: #c2185b; } /* 通用能力 */
+        
+        .cost-cell {
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        .cost-cell::before {
+            content: "¥";
+            margin-right: 2px;
+        }
+        
+        .footer {
+            padding: 20px 30px;
+            background-color: #f8fafc;
+            border-top: 1px solid #e1e8f0;
+            font-size: 14px;
+            color: #718096;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .summary {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .summary-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .summary-value {
+            font-weight: 700;
+            font-size: 18px;
+            color: #2d3748;
+        }
+        
+        .summary-label {
+            font-size: 13px;
+            color: #718096;
+        }
+        
+        .note {
+            font-size: 13px;
+            max-width: 500px;
+        }
+        
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .action-buttons {
+                width: 100%;
+                justify-content: flex-start;
+            }
+            
+            .filter-section {
+                width: 100%;
+            }
+            
+            select, .search-box {
+                min-width: 100%;
+            }
+            
+            .footer {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+        
+        /* 表格行交替背景色 */
+        tbody tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+        
+        tbody tr:nth-child(even):hover {
+            background-color: #f8fafc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-university"></i> 银行公司条线培训课题推荐表</h1>
+            <p>基于上海银启师资库，按岗位层级和培训主题分类的专业课程推荐</p>
+        </div>
+        
+        <div class="controls">
+            <div class="filter-section">
+                <div class="filter-group">
+                    <label for="position-filter">岗位筛选</label>
+                    <select id="position-filter">
+                        <option value="all">所有岗位</option>
+                        <option value="主管行长">主管行长/高级管理者</option>
+                        <option value="中级客户经理">对公客户经理（中级/资深）</option>
+                        <option value="初级客户经理">初级客户经理/新晋客户经理</option>
+                        <option value="团队负责人">团队负责人/科室主管</option>
+                        <option value="通用能力">通用能力提升（全员适用）</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="category-filter">课程类别</label>
+                    <select id="category-filter">
+                        <option value="all">所有类别</option>
+                        <option value="战略管理">战略管理</option>
+                        <option value="领导力提升">领导力提升</option>
+                        <option value="数字化转型">数字化转型</option>
+                        <option value="风险管理">风险管理</option>
+                        <option value="营销技能">营销技能</option>
+                        <option value="谈判与沟通">谈判与沟通</option>
+                        <option value="财务报表分析">财务报表分析</option>
+                        <option value="供应链金融">供应链金融</option>
+                        <option value="团队管理">团队管理</option>
+                        <option value="绩效辅导">绩效辅导</option>
+                        <option value="基础营销">基础营销</option>
+                        <option value="信贷流程">信贷流程</option>
+                        <option value="合规风控">合规风控</option>
+                        <option value="客户沟通">客户沟通</option>
+                        <option value="数字化工具">数字化工具</option>
+                        <option value="项目推动">项目推动</option>
+                        <option value="跨部门协作">跨部门协作</option>
+                        <option value="公文写作">公文写作</option>
+                        <option value="演讲表达">演讲表达</option>
+                        <option value="情绪管理">情绪管理</option>
+                        <option value="数字化转型认知">数字化转型认知</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="search-input">课程/讲师搜索</label>
+                    <input type="text" id="search-input" class="search-box" placeholder="输入课程名称或讲师姓名...">
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-download" id="download-excel">
+                    <i class="fas fa-file-excel"></i> 下载Excel文件
+                </button>
+                <button class="btn btn-reset" id="reset-filters">
+                    <i class="fas fa-redo"></i> 重置筛选
+                </button>
+            </div>
+        </div>
+        
+        <div class="table-container">
+            <table id="training-table">
+                <thead>
+                    <tr>
+                        <th width="80">序号</th>
+                        <th width="150">适用岗位</th>
+                        <th width="180">课程类别</th>
+                        <th>推荐课程</th>
+                        <th width="120">讲师</th>
+                        <th width="100">课酬(元)</th>
+                        <th width="250">重点模块</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    <!-- 数据将通过JavaScript动态加载 -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="footer">
+            <div class="summary">
+                <div class="summary-item">
+                    <span class="summary-value" id="total-courses">0</span>
+                    <span class="summary-label">总课程数</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-value" id="total-cost">0</span>
+                    <span class="summary-label">总课酬(元)</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-value" id="avg-cost">0</span>
+                    <span class="summary-label">平均课酬(元)</span>
+                </div>
+            </div>
+            
+            <div class="note">
+                <p><i class="fas fa-info-circle"></i> 注：本推荐表基于上海银启师资库内容整理，课酬仅供参考，实际费用可能因具体需求有所调整。</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 培训课程数据
+        const trainingData = [
+            // 主管行长/高级管理者
+            { id: 1, position: "主管行长", positionClass: "category-1", category: "战略管理", course: "《商业银行战略规划编制辅导工作坊》", lecturer: "陈德胜", cost: 16000, focus: "战略思维、规划方法" },
+            { id: 2, position: "主管行长", positionClass: "category-1", category: "领导力提升", course: "《Ai领导力BP》", lecturer: "杨迪", cost: 10000, focus: "团队激励、管理创新" },
+            { id: 3, position: "主管行长", positionClass: "category-1", category: "数字化转型", course: "《商业银行数字化敏捷转型策略》", lecturer: "王海", cost: 18000, focus: "数字化转型路径、敏捷组织" },
+            { id: 4, position: "主管行长", positionClass: "category-1", category: "风险管理", course: "《资本新规及全面风险管理》", lecturer: "刘晨", cost: 12000, focus: "全面风险框架、合规内控" },
+            { id: 5, position: "主管行长", positionClass: "category-1", category: "舆情与危机", course: "《危机公关与品牌声誉塑造》", lecturer: "马龙照", cost: 11000, focus: "舆情应对、危机管理" },
+            
+            // 对公客户经理（中级/资深）
+            { id: 6, position: "中级客户经理", positionClass: "category-2", category: "营销技能", course: "《对公客户经理目标企业需求挖掘综合营销技巧和DeepSeek在对公业务营销上的运用》", lecturer: "王伟良", cost: 10000, focus: "客户开发、需求挖掘" },
+            { id: 7, position: "中级客户经理", positionClass: "category-2", category: "谈判与沟通", course: "《深度营销大客户技巧篇——新解决方案型营销》", lecturer: "白若禺", cost: 10000, focus: "谈判策略、需求挖掘" },
+            { id: 8, position: "中级客户经理", positionClass: "category-2", category: "财务报表分析", course: "《商业银行财报分析与风险管理》", lecturer: "杨会臣", cost: 11000, focus: "财报解读、风险识别" },
+            { id: 9, position: "中级客户经理", positionClass: "category-2", category: "供应链金融", course: "《供应链金融专题》", lecturer: "汤培之", cost: 14000, focus: "产品设计、风险管理" },
+            { id: 10, position: "中级客户经理", positionClass: "category-2", category: "数字化转型", course: "《银行发展转型与数字化营销》", lecturer: "王兴旺", cost: 12000, focus: "普惠金融、金融科技" },
+            
+            // 初级客户经理/新晋客户经理
+            { id: 11, position: "初级客户经理", positionClass: "category-3", category: "基础营销", course: "《对公营销基础与沙盘实战》", lecturer: "贾鹏", cost: 9000, focus: "客户拜访、产品介绍" },
+            { id: 12, position: "初级客户经理", positionClass: "category-3", category: "信贷流程", course: "《对公信贷全案》", lecturer: "刘晨", cost: 12000, focus: "贷前调查、报告撰写" },
+            { id: 13, position: "初级客户经理", positionClass: "category-3", category: "合规风控", course: "《信贷业务中的法律风险防范》", lecturer: "郭耀峰", cost: 8000, focus: "法律常识、合规操作" },
+            { id: 14, position: "初级客户经理", positionClass: "category-3", category: "客户沟通", course: "《银行新消保形势下投诉管理专项培训》", lecturer: "张宁", cost: 8000, focus: "沟通技巧、投诉处理" },
+            { id: 15, position: "初级客户经理", positionClass: "category-3", category: "数字化工具", course: "《Excel在信贷数据分析中的高效应用》", lecturer: "马浩志", cost: 6000, focus: "数据处理、报表制作" },
+            
+            // 团队负责人/科室主管
+            { id: 16, position: "团队负责人", positionClass: "category-4", category: "团队管理", course: "《MTP管理才能发展训练》", lecturer: "姬涛", cost: 8000, focus: "团队建设、任务分配" },
+            { id: 17, position: "团队负责人", positionClass: "category-4", category: "绩效辅导", course: "《教练式员工辅导沟通》", lecturer: "汤信芳", cost: 8000, focus: "绩效谈话、激励方法" },
+            { id: 18, position: "团队负责人", positionClass: "category-4", category: "项目推动", course: "《行动学习引导师》", lecturer: "王伟良", cost: 10000, focus: "项目推进、问题解决" },
+            { id: 19, position: "团队负责人", positionClass: "category-4", category: "跨部门协作", course: "《打破部门墙——跨部门沟通的七项修炼》", lecturer: "龚一", cost: 15000, focus: "协作机制、沟通策略" },
+            
+            // 通用能力提升（全员适用）
+            { id: 20, position: "通用能力", positionClass: "category-5", category: "公文写作", course: "《基于金字塔模式的公文写作技法》", lecturer: "韦志国", cost: 9000, focus: "报告撰写、逻辑表达" },
+            { id: 21, position: "通用能力", positionClass: "category-5", category: "演讲表达", course: "《可复制的演说表达力》", lecturer: "柳金秋", cost: 10000, focus: "演讲技巧、表达训练" },
+            { id: 22, position: "通用能力", positionClass: "category-5", category: "情绪管理", course: "《情绪力量——工作效能提升》", lecturer: "刘映吟", cost: 10000, focus: "压力管理、情绪调节" },
+            { id: 23, position: "通用能力", positionClass: "category-5", category: "数字化转型认知", course: "《新常态下银行数字化转型规划与实施路径解析》", lecturer: "梁力军", cost: 16000, focus: "科技趋势、数字化转型" }
+        ];
+
+        // 初始化表格
+        function renderTable(data) {
+            const tableBody = document.getElementById('table-body');
+            tableBody.innerHTML = '';
+            
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.id}</td>
+                    <td><span class="category-label ${item.positionClass}">${item.position}</span></td>
+                    <td>${item.category}</td>
+                    <td><strong>${item.course}</strong></td>
+                    <td>${item.lecturer}</td>
+                    <td class="cost-cell">${item.cost.toLocaleString()}</td>
+                    <td>${item.focus}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+            
+            // 更新统计数据
+            updateSummary(data);
+        }
+        
+        // 更新统计信息
+        function updateSummary(data) {
+            const totalCourses = data.length;
+            const totalCost = data.reduce((sum, item) => sum + item.cost, 0);
+            const avgCost = totalCourses > 0 ? Math.round(totalCost / totalCourses) : 0;
+            
+            document.getElementById('total-courses').textContent = totalCourses;
+            document.getElementById('total-cost').textContent = totalCost.toLocaleString();
+            document.getElementById('avg-cost').textContent = avgCost.toLocaleString();
+        }
+        
+        // 筛选数据
+        function filterData() {
+            const positionFilter = document.getElementById('position-filter').value;
+            const categoryFilter = document.getElementById('category-filter').value;
+            const searchInput = document.getElementById('search-input').value.toLowerCase();
+            
+            let filteredData = trainingData;
+            
+            // 按岗位筛选
+            if (positionFilter !== 'all') {
+                filteredData = filteredData.filter(item => item.position === positionFilter);
+            }
+            
+            // 按类别筛选
+            if (categoryFilter !== 'all') {
+                filteredData = filteredData.filter(item => item.category === categoryFilter);
+            }
+            
+            // 按搜索词筛选
+            if (searchInput) {
+                filteredData = filteredData.filter(item => 
+                    item.course.toLowerCase().includes(searchInput) || 
+                    item.lecturer.toLowerCase().includes(searchInput) ||
+                    item.focus.toLowerCase().includes(searchInput)
+                );
+            }
+            
+            // 重新编号并渲染
+            filteredData = filteredData.map((item, index) => ({
+                ...item,
+                id: index + 1
+            }));
+            
+            renderTable(filteredData);
+        }
+        
+        // 下载Excel文件
+        function downloadExcel() {
+            // 获取当前显示的数据
+            const positionFilter = document.getElementById('position-filter').value;
+            const categoryFilter = document.getElementById('category-filter').value;
+            const searchInput = document.getElementById('search-input').value.toLowerCase();
+            
+            let filteredData = trainingData;
+            
+            if (positionFilter !== 'all') {
+                filteredData = filteredData.filter(item => item.position === positionFilter);
+            }
+            
+            if (categoryFilter !== 'all') {
+                filteredData = filteredData.filter(item => item.category === categoryFilter);
+            }
+            
+            if (searchInput) {
+                filteredData = filteredData.filter(item => 
+                    item.course.toLowerCase().includes(searchInput) || 
+                    item.lecturer.toLowerCase().includes(searchInput) ||
+                    item.focus.toLowerCase().includes(searchInput)
+                );
+            }
+            
+            // 准备Excel数据
+            const excelData = filteredData.map(item => ({
+                "序号": item.id,
+                "适用岗位": item.position,
+                "课程类别": item.category,
+                "推荐课程": item.course,
+                "讲师": item.lecturer,
+                "课酬(元)": item.cost,
+                "重点模块": item.focus
+            }));
+            
+            // 创建工作簿
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.json_to_sheet(excelData);
+            
+            // 设置列宽
+            const wscols = [
+                {wch: 8},  // 序号
+                {wch: 18}, // 适用岗位
+                {wch: 18}, // 课程类别
+                {wch: 50}, // 推荐课程
+                {wch: 15}, // 讲师
+                {wch: 12}, // 课酬
+                {wch: 40}  // 重点模块
+            ];
+            ws['!cols'] = wscols;
+            
+            // 添加工作表到工作簿
+            XLSX.utils.book_append_sheet(wb, ws, "培训课程推荐表");
+            
+            // 生成文件名
+            const fileName = `银行公司条线培训课程推荐表_${new Date().toISOString().slice(0,10)}.xlsx`;
+            
+            // 写入文件并下载
+            XLSX.writeFile(wb, fileName);
+        }
+        
+        // 重置筛选
+        function resetFilters() {
+            document.getElementById('position-filter').value = 'all';
+            document.getElementById('category-filter').value = 'all';
+            document.getElementById('search-input').value = '';
+            renderTable(trainingData.map((item, index) => ({...item, id: index + 1})));
+        }
+        
+        // 初始化事件监听
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始渲染
+            renderTable(trainingData.map((item, index) => ({...item, id: index + 1})));
+            
+            // 筛选事件监听
+            document.getElementById('position-filter').addEventListener('change', filterData);
+            document.getElementById('category-filter').addEventListener('change', filterData);
+            document.getElementById('search-input').addEventListener('input', filterData);
+            
+            // 按钮事件监听
+            document.getElementById('download-excel').addEventListener('click', downloadExcel);
+            document.getElementById('reset-filters').addEventListener('click', resetFilters);
+        });
+    </script>
+</body>
+</html>
